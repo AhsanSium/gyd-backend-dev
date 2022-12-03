@@ -71,6 +71,29 @@ async function run() {
       res.json({ admin: isAdmin });
     });
 
+    app.get("/users", async (req, res) => {
+
+      usersCollection.find({}).toArray(function (err, user) {
+
+
+        if (err) {
+          console.log(err);
+        }
+
+        if (user) {
+          // return user (without hashed password)
+          console.log("\n", user);
+          res.json(user);
+        } else {
+          // user not found
+
+        }
+      });
+
+
+
+    });
+
     app.get("/usersData/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
