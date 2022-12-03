@@ -42,11 +42,12 @@ async function run() {
     const database = client.db("doctors_portal");
     const appointmentsCollection = database.collection("appointments");
     const usersCollection = database.collection("users");
-    app.get("/appointments", verifyToken, async (req, res) => {
-      const email = req.query.email;
-      const date = req.query.date;
 
-      const query = { email: email, date: date };
+    app.get("/appdata/:email", async (req, res) => {
+      const email = req.params.email;
+      //const date = req.query.date;
+
+      const query = { email: email };
 
       const cursor = appointmentsCollection.find(query);
       const appointments = await cursor.toArray();
@@ -93,6 +94,7 @@ async function run() {
 
 
     });
+
 
     app.get("/usersData/:email", async (req, res) => {
       const email = req.params.email;
