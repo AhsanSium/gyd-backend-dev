@@ -41,6 +41,8 @@ async function run() {
     await client.connect();
     const database = client.db("doctors_portal");
     const appointmentsCollection = database.collection("appointments");
+    const prescriptionCollection = database.collection("prescription");
+    const prescriptionSolvedCollection = database.collection("prescription-solved");
     const usersCollection = database.collection("users");
 
     app.get("/appdata/:email", async (req, res) => {
@@ -59,6 +61,68 @@ async function run() {
       const result = await appointmentsCollection.insertOne(appointment);
       console.log(appointment);
       res.json(result);
+    });
+
+    app.post("/prescription", async (req, res) => {
+      const appointment = req.body;
+      if (!appointment.email) {
+        res.status(500).json({ err: "Empty Form, Try Again" })
+      }
+      else {
+        const result = await prescriptionCollection.insertOne(appointment);
+        console.log(appointment);
+        res.json(result);
+      }
+    });
+
+    app.get("/prescription", async (req, res) => {
+
+      prescriptionCollection.find({}).toArray(function (err, user) {
+        if (err) {
+          console.log(err);
+        }
+
+        if (user) {
+          // return user (without hashed password)
+          console.log("\n", user);
+          res.json(user);
+        } else {
+          // user not found
+
+        }
+      });
+
+    });
+
+    app.post("/prescription-solved", async (req, res) => {
+      const appointment = req.body;
+      if (!appointment.prescriptionId) {
+        res.status(500).json({ err: "Empty Form, Try Again" })
+      }
+      else {
+        const result = await prescriptionSolvedCollection.insertOne(appointment);
+        console.log(appointment);
+        res.json(result);
+      }
+    });
+
+    app.get("/prescription-solved", async (req, res) => {
+
+      prescriptionSolvedCollection.find({}).toArray(function (err, user) {
+        if (err) {
+          console.log(err);
+        }
+
+        if (user) {
+          // return user (without hashed password)
+          console.log("\n", user);
+          res.json(user);
+        } else {
+          // user not found
+
+        }
+      });
+
     });
 
     app.get("/users/:email", async (req, res) => {
