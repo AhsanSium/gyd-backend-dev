@@ -18,6 +18,8 @@ admin.initializeApp({
 app.use(cors());
 app.use(express.json());
 
+var ObjectId = require('mongodb').ObjectID;
+
 const uri = `mongodb+srv://doctorsDB:lsEACJFqgMxfOemt@cluster0.lzwpo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -43,6 +45,7 @@ async function run() {
     const appointmentsCollection = database.collection("appointments");
     const prescriptionCollection = database.collection("prescription");
     const prescriptionSolvedCollection = database.collection("prescription-solved");
+    const testCollection = database.collection("test");
     const usersCollection = database.collection("users");
 
     app.get("/appdata/:email", async (req, res) => {
@@ -125,6 +128,37 @@ async function run() {
 
     });
 
+    app.post("/test-solved", async (req, res) => {
+      const appointment = req.body;
+      if (!appointment.prescriptionId) {
+        res.status(500).json({ err: "Empty Form, Try Again" })
+      }
+      else {
+        const result = await testCollection.insertOne(appointment);
+        console.log(appointment);
+        res.json(result);
+      }
+    });
+
+    app.get("/test-solved", async (req, res) => {
+
+      testCollection.find({}).toArray(function (err, user) {
+        if (err) {
+          console.log(err);
+        }
+
+        if (user) {
+          // return user (without hashed password)
+          console.log("\n", user);
+          res.json(user);
+        } else {
+          // user not found
+
+        }
+      });
+
+    });
+
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -171,6 +205,15 @@ async function run() {
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
+      console.log(result);
+
+      res.json(result);
+    });
+
+    app.delete("/users", async (req, res) => {
+      const user_id = req.body.id;
+      console.log(user_id);
+      const result = await usersCollection.deleteOne({ "_id": ObjectId(user_id) });
       console.log(result);
 
       res.json(result);
